@@ -8,8 +8,8 @@ http://3dinterpreter.csail.mit.edu
 #### Torch
 We use Torch 7 (http://torch.ch) for our implementation.
 
-#### fb.mattorch and Matlab
-We use `.mat` file with [`fb.mattorch`](https://github.com/facebook/fblualib/tree/master/fblualib/mattorch) for saving results, and `Matlab` for visualization. Matlab release must be 2015a or later.
+#### fb.mattorch and Matlab (optional)
+We use `.mat` file with [`fb.mattorch`](https://github.com/facebook/fblualib/tree/master/fblualib/mattorch) for saving results, and `Matlab` (R2015a or later, with Computer Vision System Toolbox) for visualization. 
 
 ## Installation
 Our current release has been tested on Ubuntu 14.04.
