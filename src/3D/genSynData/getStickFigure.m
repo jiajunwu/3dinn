@@ -4,6 +4,39 @@ function stickStruct = getStickFigure(varargin)
 % 
 % Parameters:
 %   scale, class, indexPermute
+%
+% Fields of stickStruct
+%   - nclass: ignore this field, this is always 1
+%   - edgeAdj: M x 2 adjacent matrices, where M is the number of edges
+%   - baseShape: 3 x N x B, where N is number of nodes, and B is number of
+%   bases. baseShape(:,:,1) is the mean base shape, and baseShape(:, :, i)
+%   are the additional deformation. See the demo code below for more
+%   details.
+%   - np: number of nodes
+%   - nbasis: number of bases
+%   - alphaGSif: ignore this field
+%   - scaleRange: Range of scaling in camera parameters. 
+%   - thetaRange: Range of rotation angles in camera parameters. 
+%   - tranRange: Range of translation in camera parameters. 
+%   - fRange: Range of focal length
+%   - h: the height of the input image
+%   - w: the with of the input image
+%   - indices: normally, it should be 1:N. For some models, it is not to
+%   deal with some indices inconsistency.
+% 
+% Demo code:
+% 
+% cd [gitroot]/src
+% addpath(genpath('3D'));
+% addpath(genpath('nn'));
+% stickStruct = getStrickFigure('class', 'chair');
+% subplot(2,3,1); show3DLD(stickStruct.baseShape{1}(:,:,1), stickStruct.edgeAdj{1});
+% title('Mean shape');
+% for i = 2:5
+%     subplot(2,3,i); show3DLD(stickStruct.baseShape{1}(:,:,1) + ...
+%         stickStruct.baseShape{1}(:,:,i), stickStruct.edgeAdj{1});
+%     title(sprintf('The %d-th deformation', i-1));
+% end
 
 para.scale = [];
 para.class = 'chair';
@@ -138,74 +171,6 @@ elseif strcmp(para.class, 'sofa')
     stickStruct.h = 320;
     stickStruct.w = 240;         
     stickStruct.indices{1} = [2,9,8,1,4,11,10,3,7,14,5,6,12,13];
-    stickStruct.shapecheckFunc = [];  
-elseif strcmp(para.class, 'human')
-	stickStruct.np = 11;
-	stickStruct.nbasis = 14;
-	stickStruct.edgeAdj{1} = [1,2; 2,3; 3,4; 4,5; 5,6; 6,7; 7,8; 8,9; 9,10; 10,11];
-	stickStruct.baseShape{1} = zeros(3,stickStruct.np,stickStruct.nbasis);
-	stickStruct.baseShape{1}(:,:,1) = [-3,0,0; -3,1,0; -3,2,0; -2,3,0; -1,4,0; 0,4,0; 1,4,0; 2,3,0; 3,2,0; 3,1,0;3,0,0]';
-	stickStruct.baseShape{1}(:,:,2) = -[1,0,0; 0.5,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';   % left wrist
-	stickStruct.baseShape{1}(:,:,3) = -[0,1,0; 0,0.5,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';
-	stickStruct.baseShape{1}(:,:,4) = [0,0,1; 0,0,0.5; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';
-	stickStruct.baseShape{1}(:,:,5) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0.5,0,0; 1,0,0]';    % right wrist
-	stickStruct.baseShape{1}(:,:,6) = -[0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0.5,0; 0,1,0]';
-	stickStruct.baseShape{1}(:,:,7) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0.5; 0,0,1]';
-	stickStruct.baseShape{1}(:,:,8) = -[1,0,0; 1,0,0; 1,0,0; 0.5,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';   % left albow
-	stickStruct.baseShape{1}(:,:,9) = -[0,1,0; 0,1,0; 0,1,0; 0,0.5,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';
-	stickStruct.baseShape{1}(:,:,10) = [0,0,1; 0,0,1; 0,0,1; 0,0,0.5;   0,0,0; 0,0,0; 0,0,0;    0,0,0; 0,0,0; 0,0,0; 0,0,0]';
-	stickStruct.baseShape{1}(:,:,11) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0.5,0,0; 1,0,0; 1,0,0; 1,0,0]';   % right albow
-	stickStruct.baseShape{1}(:,:,12) = -[0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0.5,0; 0,1,0; 0,1,0; 0,1,0]';
-	stickStruct.baseShape{1}(:,:,13) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0;    0,0,0.5; 0,0,1; 0,0,1; 0,0,1]';
-	stickStruct.baseShape{1}(:,:,14) = [-1,0,0; -1,0,0; -1,0,0; -1,0,0;   -1,0,0; 0,0,0; 1,0,0;    1,0,0; 1,0,0; 1,0,0; 1,0,0]';
-    stickStruct.alphaRange{1} = [-4,1;-4,2;0,3;     -4,1;-4,2;0,3;     -4,1;-4,2;0,3;   -4,1;-4,2;0,3;    0.4,0.9];
-    stickStruct.alphaGSif = true;
-%     stickStruct.alphaRange{1} = [-4,1;-4,2;-3,3;     -4,1;-4,2;-3,3;     -4,1;-4,2;-3,3;   -4,1;-4,2;-3,3;    0.4,0.9];
-	stickStruct.scaleRange{1} = [10,55];
-    stickStruct.tranRange{1} = [-40,40;-20,100];
-%     stickStruct.thetaRange{1} = [pi,pi; -0.2*pi,0.2*pi; 0,0];
-    stickStruct.thetaRange{1} = [pi,pi; -0.2*pi,0.2*pi; 0,0];
-    stickStruct.fRange{1} = [1e10,1e10];    % no perspective 
-    stickStruct.h = 320;
-    stickStruct.w = 240;
-    % stickStruct.indices{1} = [3,7,2,8,1,11,4,10,5,9,6];
-    stickStruct.indices{1} = [6,9,5,10,4,11,1,8,2,7,3];
-    stickStruct.shapecheckFunc = @check_human;
-elseif strcmp(para.class, 'bird')
-	stickStruct.np = 15;
-	stickStruct.nbasis = 16;
-	stickStruct.edgeAdj{1} = [1,15; 2,15; 3,15; 4,15; 1,5; 4,6; 5,7; 6,8; 7,13; 8,13; 13,9; 13,10; 8,11; 8,12; 13,14];
-	stickStruct.baseShape{1} = zeros(3,stickStruct.np,stickStruct.nbasis);
-	stickStruct.baseShape{1}(:,:,1) = [3,0,0; 2.5,0.5,-0.5; 2.5,0.5,0.5; 2,1,0;     2,-1,0; 1,1,0; 1,-1,0; -1,1,0;      -1,-3,-1; -1,-3,1; -1,1,-2; -1,1,2;     -1,-1,0; -3,0,0; 2.5,0.5,0]';
-
-	stickStruct.baseShape{1}(:,:,2) = [0,0,0; 0,0.5,0; 0,0.5,0; 0,1,0;   0,-1,0; 0,1,0; 0,-1,0; 0,1,0;   0,-1,0; 0,-1,0; 0,1,0; 0,1,0;   0,-1,0;0,0,0; 0,0.5,0;]';  % height of bird
-	stickStruct.baseShape{1}(:,:,3) = [0,1,0; 0,0.5,0; 0,0.5,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0; 0,0.5,0;]'; % location of beak
-	stickStruct.baseShape{1}(:,:,4) = [0,1,0; 0,1,0; 0,1,0; 0,1,0;   0,1,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0; 0,1,0;]'; % location of crown
-	stickStruct.baseShape{1}(:,:,5) = [0,0,0; 0,0,-1; 0,0,1; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0;0,0,0;]'; % distance between eyes
-	stickStruct.baseShape{1}(:,:,6) = [1,0,0; 0.5,0,0; 0.5,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0; 0.5,0,0;]'; % length of head
-
-	stickStruct.baseShape{1}(:,:,7) = [1,0,0; 1,0,0; 1,0,0; 1,0,0;   1,0,0; 1,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0; 1,0,0;]'; % length of body
-	stickStruct.baseShape{1}(:,:,8) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;-1,0,0; 0,0,0;]'; % length of tail
-
-	stickStruct.baseShape{1}(:,:,9) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 1,0,0; 1,0,0;    0,0,0;0,0,0;0,0,0;]'; % location of wing
-	stickStruct.baseShape{1}(:,:,10) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,1,0; 0,1,0;   0,0,0;0,0,0;0,0,0;]';
-	stickStruct.baseShape{1}(:,:,11) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,-1; 0,0,1;    0,0,0;0,0,0;0,0,0;]';
-
-	stickStruct.baseShape{1}(:,:,12) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   1,0,0; 1,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0;0,0,0;]'; % location of leg
-	stickStruct.baseShape{1}(:,:,13) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,-1,0; 0,-1,0; 0,0,0; 0,0,0;   0,0,0;0,0,0;0,0,0;]'; % 
-	stickStruct.baseShape{1}(:,:,14) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,-1; 0,0,1; 0,0,0; 0,0,0;   0,0,0;0,0,0;0,0,0;]'; % 
-	stickStruct.baseShape{1}(:,:,15) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,1,0;0,0,0;]'; % height of tail
-    stickStruct.baseShape{1}(:,:,16) = [0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0; 0,0,0; 0,0,0; 0,0,0;   0,0,0;0,0,0;0,1,0;]'; % loc forehead
-
-	stickStruct.alphaRange{1} = [-0.5,0.8;-1,1;-1,1;-0.3,0.3;-0.5,1;    -1, 1;-1.5,1.5;   -1.3,1.3;-1.3,1.3;-1.3,1.3;   -1,1; -1,1; -0.5,0.5;   -1,1;-0.2,0.2;]/3;
-    stickStruct.alphaGSif = true;
-	stickStruct.scaleRange{1} = [20,50];
-    stickStruct.tranRange{1} = [-40,40;-120,40];
-    stickStruct.thetaRange{1} = [1.0*pi,1.15*pi; 0,2*pi; 0,0];
-    stickStruct.fRange{1} = [1e10,1e10];    % no perspective
-    stickStruct.h = 320;
-    stickStruct.w = 240;    
-    stickStruct.indices{1} = [2,7,11,5,15,10,4,1,8,12,9,13,3,14,6];
     stickStruct.shapecheckFunc = [];
 end
 
